@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appliance store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.9rem;
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: contain;
+            padding: 15px;
+        }
+    </style>
+    <script src="/addToCart.js" ></script>
+</head>
+<body>
+<div id="nav-container">
+    <div th:insert="~{menunavy::futher-nav(isEmployee=${false})}"></div>
+</div>
+<div class="container py-5">
+    <h1 class="mb-4" th:text="#{shop.name}" ></h1>
+
+    <!-- Filter and sorting -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form th:action="@{/appliances}" method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <select name="category" class="form-select">
+                                <option value="" th:text="#{object.appliance.categories}" ></option>
+                                <option th:each="cat : ${categories}"
+                                        th:value="${cat}"
+                                        th:text="${cat}"
+                                        th:selected="${cat.toString() == selectedCategory}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="sort" class="form-select">
+                                <option value="cheap" th:selected="${selectedSort == 'cheap'}" th:text="#{product.sort.cheap.label}" ></option>
+                                <option value="expensive" th:selected="${selectedSort == 'expensive'}" th:text="#{product.sort.expensive.label}" ></option>
+                                <option value="power" th:selected="${selectedSort == 'power'}" th:text="#{product.sort.power.label}" ></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="discounted" id="discounted"
+                                       th:checked="${discounted}">
+                                <label class="form-check-label" for="discounted" th:text="#{product.sort.only.discounted}">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100" th:text="#{general.btn.apply}"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appliance list -->
+    <div class="row">
+        <div th:each="appliance : ${appliances}" class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 position-relative">
+                <!-- Discount -->
+                <div th:if="${appliance.discount}" class="discount-badge bg-danger text-white rounded-pill px-3 py-1">
+                    -<span th:text="${appliance.discount}"></span>%
+                </div>
+
+                <!-- Image -->
+                <img th:src="@{'product.jpg'}"
+                     class="card-img-top">
+
+                <div class="card-body d-flex flex-column">
+                    <!-- Category -->
+                    <span class="badge bg-info mb-2 align-self-start" th:text="${appliance.category}"></span>
+
+                    <!-- Title and description -->
+                    <h5 class="card-title" th:text="${appliance.name}"></h5>
+                    <p class="card-text flex-grow-1" th:text="${appliance.description}"></p>
+
+                    <!-- Characteristic -->
+                    <div class="mb-2">
+                        <small class="text-muted" th:text="#{object.appliance.power} + ' ' + ${appliance.power} + ' W'"></small>
+                    </div>
+
+                    <!-- Цена -->
+                    <div class="mt-auto">
+                        <div th:if="${appliance.discount > 0}">
+                            <span class="original-price" th:text="${appliance.price} + ' ₴'"></span>
+                            <h4 class="text-danger" th:text="${appliance.priceWithDiscount} + ' ₴'"></h4>
+                        </div>
+                        <div th:unless="${appliance.discount > 0}">
+                            <h4 class="text-dark" th:text="${appliance.price} + ' ₴'"></h4>
+                        </div>
+                    </div>
+
+                    <button id="add-item-to-card"
+                            class="btn btn-primary"
+                            th:data-id="${appliance.id}"
+                            th:data-name="${appliance.name}"
+                            th:data-price="${appliance.priceWithDiscount}"
+                            th:text="#{cart.btn.in-cart}"
+                            onclick="addToCart(this)">
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<div class="toast-container position-fixed bottom-0 start-0 p-3">
+    <div id="cart-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"
+            th:text="#{banner.add-to-cart}">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+    <script src="/addToCart.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+<div th:replace="~{
+    fragments/pagination :: pagination(path='/appliances',
+    currentPage=${currentPage},
+    currentSize=${currentSize},
+    totalPages=${totalPages})
+    }"></div>
+
+</body>
+
+</html>

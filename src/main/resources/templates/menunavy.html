@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<!--home page-->
+<div th:fragment="auth-nav(role)">
+    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/" th:text="#{shop.name}"></a>
+
+            <div class="btn-group" role="group">
+                <a th:href="@{/(lang=en)}"
+                   class="btn btn-sm btn-outline-secondary"
+                   th:classappend="${#locale.language == 'en'} ? 'active'">
+                    <span>En</span>
+                </a>
+                <a th:href="@{/(lang=uk)}"
+                   class="btn btn-sm btn-outline-secondary"
+                   th:classappend="${#locale.language == 'uk'} ? 'active'">
+                    <span>Укр</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+
+                    <!--                   FOR CLIENTS-->
+                    <li th:if="${role == 'CLIENT'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/cabinet}" th:text="#{cabinet.menu.name}">Cabinet</a>
+                    </li>
+                    <li th:if="${role == 'CLIENT'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/appliances}" th:text="#{appliances.menu.name}">Appliance</a>
+                    </li>
+
+
+                    <!--                    FOR MANAGERS-->
+                    <li th:if="${role == 'MANAGER'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/cabinet}" th:text="#{cabinet.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'MANAGER'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/clients}" th:text="#{clients.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'MANAGER'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/appliances}" th:text="#{appliances.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'MANAGER'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/orders}" th:text="#{all-orders.menu.name}"></a>
+                    </li>
+
+
+
+                    <!--                    FOR ADMINS-->
+                    <li th:if="${role == 'ADMIN'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/cabinet}" th:text="#{cabinet.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'ADMIN'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/clients}" th:text="#{clients.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'ADMIN'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/employees}" th:text="#{employees.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'ADMIN'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/manufacturers}" th:text="#{manufacturers.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'ADMIN'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/appliances}" th:text="#{appliances.menu.name}"></a>
+                    </li>
+                    <li th:if="${role == 'ADMIN'}" class="nav-item">
+                        <a class="nav-link" th:href="@{/internal/orders}" th:text="#{all-orders.menu.name}"></a>
+                    </li>
+                </ul>
+
+                <ul th:if="${role}" class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom-logout" th:text="#{user.btn.logout}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!--home page-->
+<div th:fragment="not-auth-nav">
+
+    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/" th:text="#{shop.name}"></a>
+            <div class="btn-group" role="group">
+                <a th:href="@{/(lang=en)}"
+                   class="btn btn-sm btn-outline-secondary"
+                   th:classappend="${#locale.language == 'en'} ? 'active'">
+                    <span>En</span>
+                </a>
+                <a th:href="@{/(lang=uk)}"
+                   class="btn btn-sm btn-outline-secondary"
+                   th:classappend="${#locale.language == 'uk'} ? 'active'">
+                    <span>Укр</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <div class="moving-text" th:text="#{promo.title}"></div>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-link">
+                        <a data-bs-toggle="modal" data-bs-target="#myModal"
+                           th:text="#{user.btn.account}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <style>
+        @keyframes moveText {
+            0% {
+                transform: translateX(100%);
+            }
+            50% {
+                transform: translateX(-10%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .moving-text {
+            display: inline-block;
+            font-family: 'Arial', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            animation: moveText 10s linear infinite;
+        }
+    </style>
+</div>
+
+<!--everything except the home page-->
+<div th:fragment="futher-nav(isEmployee)">
+
+    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/" th:text="#{shop.name}"></a>
+
+            <div th:unless="${isEmployee}" class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <div class="moving-text" th:text="#{promo.title}" ></div>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link position-relative p-1" href="/cart" id="cartLink">
+                            <i class="bi bi-cart fs-5"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        @keyframes moveText {
+            0% {
+                transform: translateX(120%);
+            }
+            50% {
+                transform: translateX(-10%);
+            }
+            100% {
+                transform: translateX(120%);
+            }
+        }
+        .moving-text {
+            display: inline-block;
+            font-family: 'Arial', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            animation: moveText 10s linear infinite;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>New Employee</title>
+</head>
+
+<body>
+<div th:insert="~{menunavy::futher-nav(isEmployee=${true})}"></div>
+
+<div class="container">
+    <h2>Create New Employee</h2>
+
+    <form th:action="@{/internal/employees}" th:object="${createDTO}" method="post">
+
+        <div class="mb-3">
+            <label for="name" class="form-label" th:text="#{general.title.name}" ></label>
+            <input type="text" id="name" class="form-control" th:field="*{name}" />
+            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label" th:text="#{general.title.email}" ></label>
+            <input type="text" id="email" class="form-control" th:field="*{email}" />
+            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="department" class="form-label" th:text="#{object.employee.department}" ></label>
+            <input list="departmentsList" id="department" name="department" class="form-control" th:field="*{department}" />
+            <datalist id="departmentsList">
+                <option th:each="d : ${departments}" th:value="${d}"></option>
+            </datalist>
+            <div class="text-danger" th:if="${#fields.hasErrors('department')}" th:errors="*{department}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-9 offset-sm-3">
+                <input type="submit" class="btn btn-primary" value="Create Employee">
+                <a th:href="@{/internal/employees}" class="btn btn-secondary ms-2" th:text="#{general.btn.cancel}" ></a>
+            </div>
+        </div>
+    </form>
+
+
+</div>
+
+<div th:insert="~{footer::footer}"></div>
+</body>
+</html>

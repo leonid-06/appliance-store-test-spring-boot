@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link th:href="@{/styles/css/main.css}" rel="stylesheet"/>
+    <title>Title</title>
+</head>
+<body>
+
+<div th:insert="~{menunavy::futher-nav(isEmployee=${true})}"></div>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Orders</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th th:text="#{general.title.id}"></th>
+                <th th:text="#{general.title.status}"></th>
+                <th th:text="#{object.order.client}"></th>
+                <th th:text="#{object.order.employee}"></th>
+                <th></th>
+                <th th:text="#{orders.total}"></th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ord : ${orders}">
+                <td th:text="${ord.id}"></td>
+                <td>
+                    <span th:text="${ord.status.name()}" ></span>
+                </td>
+                <td th:text="${ord.client?.email} ?: 'N/A'"></td>
+                <td th:text="${ord.employee?.email} ?: 'N/A'"></td>
+                <td>
+                    <ul class="list-unstyled">
+                        <li th:each="row : ${ord.orderRowSet}">
+                            <span th:text="${row.appliance.name}"></span> ×
+                            <span th:text="${row.number}"></span>
+                            <span th:text="${row.amount}"></span>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+                    <strong th:text="${ord.priceAtPurchase}"></strong>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <!-- Approve button -->
+                        <a th:if="${ord.status == T(com.epam.rd.autocode.assessment.appliances.model.enums.OrderStatus).PENDING}"
+                           th:href="@{/internal/orders/{orderId}/approved(orderId=${ord.id})}"
+                           class="btn btn-outline-success">
+                            <i class="bi bi-check-circle"></i> <span th:text="#{general.btn.approve}" ></span>
+                        </a>
+                        <!-- Delete button -->
+                        <a th:unless="${ord.status == T(com.epam.rd.autocode.assessment.appliances.model.enums.OrderStatus).CANCELLED_BY_CLIENT
+                                       or
+                                       ord.status == T(com.epam.rd.autocode.assessment.appliances.model.enums.OrderStatus).CANCELLED_BY_EMPLOYEE}"
+                        th:href="@{/internal/orders/{orderId}/delete(orderId=${ord.id})}"
+                           class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> <span th:text="#{general.btn.delete}" ></span>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div th:insert="~{footer::footer}"></div>
+</body>
+</html>

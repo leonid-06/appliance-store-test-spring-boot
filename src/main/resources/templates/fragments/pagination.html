@@ -1,0 +1,29 @@
+<div th:fragment="pagination(path, currentPage, currentSize, totalPages)">
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${path}(page=${currentPage - 1}, size=${currentSize})}"
+                   th:text="#{general.btn.back}" ></a>
+            </li>
+
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${path}(page=${currentPage + 1}, size=${currentSize})}"
+                   th:text="#{general.btn.next}"></a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="mt-3">
+        <span th:text="#{general.title.count-of-items-in-page}" ></span>
+        <a th:href="@{${path}(page=${currentPage}, size=5)}" th:text="${currentSize == 5 ? '5 (selected)' : '5'}"></a> |
+        <a th:href="@{${path}(page=${currentPage}, size=20)}" th:text="${currentSize == 20 ? '20 (selected)' : '20'}"></a> |
+    </div>
+</div>
+
+
+<!--            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"-->
+<!--                class="page-item" th:classappend="${i == currentPage} ? 'active'">-->
+<!--                <a class="page-link" th:href="@{/appliances(page=${i}, size=${currentSize})}" th:text="${i + 1}"></a>-->
+<!--            </li>-->

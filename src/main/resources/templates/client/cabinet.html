@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client Cabinet</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div th:insert="~{menunavy::futher-nav(isEmployee=${false})}"></div>
+
+<div class="container mt-4">
+
+    <h2 class="mb-4" th:text="#{general.title.client-cabinet}"></h2>
+    <div class="row">
+        <!-- Client Info Column -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span th:text="#{general.title.info}"></span>
+                    <a th:href="@{/cabinet/edit}" class="btn btn-sm btn-outline-primary"
+                       th:text="#{general.btn.edit}">
+                    </a>
+                </div>
+                <div class="card-body">
+                    <p><strong th:text="#{general.title.name} + ': '"></strong>
+                        <span th:text="${responseDTO.name}"></span>
+                    </p>
+                    <p><strong th:text="#{general.title.email} + ': '"></strong>
+                        <span th:text="${responseDTO.email}"></span>
+                    </p>
+                    <p><strong th:text="#{general.title.phone} + ': '"></strong>
+                        <span th:text="${responseDTO.phoneNumber}"></span>
+                    </p>
+                    <p><strong th:text="#{object.client.card} + ': '"></strong>
+                        **** **** **** <span th:text="${responseDTO.cardLastFourDigits}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Info Column -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span th:text="#{object.client.my-orders}"></span>
+                    <span class="badge bg-light text-dark" th:text=" #{orders.total} + ': ' + ${orders.size()}"></span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th th:text="#{general.title.id}"></th>
+                            <th th:text="#{general.title.status}"></th>
+                            <th th:text="#{general.title.products}"></th>
+                            <th th:text="#{orders.total}"></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${orders.isEmpty()}">
+                            <td colspan="4" class="text-center text-muted py-4" th:text="#{orders.no-found}"></td>
+                        </tr>
+                        <tr th:each="ord : ${orders}">
+                            <td th:text="'#' + ${ord.id}"></td>
+                            <td>
+
+                <span th:if="${ord.status.toString() == 'PENDING'}"
+                      class="badge bg-warning text-dark"
+                      th:text="#{order.status.PENDING}">
+                </span>
+
+                                <span th:if="${ord.status.toString() == 'CONFIRMED'}"
+                                      class="badge bg-success"
+                                      th:text="#{order.status.CONFIRMED}">
+                </span>
+
+                                <span th:if="${ord.status.toString() == 'CANCELLED_BY_EMPLOYEE'}"
+                                      class="badge bg-danger"
+                                      th:text="#{order.status.CANCELLED_BY_EMPLOYEE}">
+                </span>
+                            </td>
+                            <td>
+                                <div th:each="row : ${ord.orderRowSet}">
+                                    <small th:text="${row.number} + ' × ' + ${row.appliance.name}"></small>
+                                    <br>
+                                </div>
+                            </td>
+                            <td th:text="${ord.getTotal()}"></td>
+                            <td>
+
+                                <div th:if="${ord.status.toString() == 'PENDING' || ord.status.toString() == 'CONFIRMED'}"
+                                     th:with="orderID=${ord.id}">
+                                    <button type="button" class="btn btn-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#exampleModal"
+                                            th:text="#{general.btn.cancel}">
+                                    </button>
+
+                                    <div th:replace="~{fragments/modal :: exampleModal(
+                      modalTitle=#{modal.title.cancel-order},
+                      modalQuestion=#{modal.title.cancel-order.question},
+                      modalYesLink=@{/orders/cancel/{id}(id=${orderID})}
+                      )}">
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${isCreated}" >
+
+        <div th:replace="~{fragments/success-modal ::
+       success-modal(modalTitle=#{order.successfully.created})
+       }"></div>
+
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link th:href="@{/styles/css/main.css}" rel="stylesheet"/>
+    <title>About client</title>
+</head>
+
+<body>
+<div th:insert="~{menunavy::futher-nav(isEmployee=${true})}"></div>
+
+<div class="container-fluid py-4">
+    <div class="row">
+
+<!--        Client info-->
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0" th:text="#{general.title.client-info}" ></h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" th:text="#{general.title.name}" ></label>
+                        <p class="form-control-plaintext" th:text="${client.name}">John Doe</p>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" th:text="#{general.title.email}" ></label>
+                            <p class="form-control-plaintext" th:text="${client.email}">email@example.com</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" th:text="#{general.title.phone}" ></label>
+                            <p class="form-control-plaintext" th:text="${client.phoneNumber}">+1234567890</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" th:text="#{object.client.card}" ></label>
+                            <p class="form-control-plaintext">
+                                **** **** **** <span th:text="${client.cardLastFourDigits}">1234</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" th:text="#{general.title.id}" ></label>
+                            <p class="form-control-plaintext" th:text="${client.id}">12345</p>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                        <a th:href="@{/internal/clients/{id}/delete(id=${client.id})}"
+                           class="btn btn-outline-danger">
+                            <i class="bi bi-person"></i> <span th:text="#{general.btn.delete}" ></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!--        Clients orders-->
+        <div class="col-lg-7">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0" th:text="#{object.client.my-orders}" ></h2>
+                    <span class="badge bg-light text-dark" th:text="'Total: ' + ${orders.size()}">Total: 0</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th th:text="#{general.title.id}" ></th>
+                                <th th:text="#{general.title.status}" ></th>
+                                <th></th>
+                                <th th:text="#{orders.total}"></th>
+                                <th th:text="#{orders.approved-by}"></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+<!--                            if there are no orders-->
+                            <tr th:if="${orders.isEmpty()}">
+                                <td colspan="6" class="text-center text-muted py-4" th:text="#{orders.no-found}" ></td>
+                            </tr>
+
+<!--                            at least one order-->
+                            <tr th:each="ord : ${orders}">
+                                <td th:text="${ord.id}">#10025</td>
+
+<!--                                Order status-->
+                                <td>
+                                    <span th:if="${ord.approved}" class="badge bg-success" th:text="#{order.status.approved}" ></span>
+                                    <span th:unless="${ord.approved}" class="badge bg-warning text-dark" th:text="#{order.status.pending}" ></span>
+                                </td>
+
+<!--                                Order rows-->
+                                <td>
+                                    <div th:each="row : ${ord.orderRowSet}">
+                                        <small th:text="${row.number} + ' × ' + ${row.appliance.name} + ' (' + ${row.amount} + ')'">1 × Fridge (999.99)</small>
+                                        <br>
+                                    </div>
+                                </td>
+
+                                <!-- Общая сумма -->
+                                <td th:text="${ord.getTotal()}"></td>
+
+                                <!-- Кто одобрил -->
+                                <td>
+                                <span th:if="${ord.employee != null}"
+                                      th:text="${ord.employee.email}">
+                                </span>
+                                    <span th:unless="${ord.employee != null}" class="text-muted" th:text="#{order.status.no-approved}" ></span>
+                                </td>
+
+                                <!-- Действия -->
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- Кнопка апрува -->
+                                        <a th:unless="${ord.approved}"
+                                           th:href="@{/internal/orders/{orderId}/approved(orderId=${ord.id})}"
+                                           class="btn btn-outline-success"
+                                        th:text="#{general.btn.approve}">
+
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:insert="~{footer::footer}"></div>
+</body>
+</html>

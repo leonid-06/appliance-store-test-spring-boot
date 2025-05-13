@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appliance Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!--Navigation-->
+<div th:if="${role}" th:insert="~{menunavy::auth-nav(role=${role})}"></div>
+<div th:unless="${role}" th:insert="~{menunavy::not-auth-nav}"></div>
+
+<!--Login and Singup-->
+<div th:unless="${role}">
+    <div class="modal" tabindex="-1" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title signin-title" th:text="#{form.singin.title}"></h5>
+                    <h5 class="modal-title signup-title" style="display: none" th:text="#{form.singup.title}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!--          LOGIN FORM        -->
+                    <form id="loginForm" th:action="@{login}" method="post" th:object="${loginDto}">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label" th:text="#{object.user.email}"></label>
+                            <input type="text" class="form-control" id="login-email" th:field="*{email}">
+                            <div th:if="${#fields.hasErrors('email')}" class="text-danger mt-2"
+                                 th:errors="*{email}"></div>
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="login-pass" class="form-label" th:text="#{object.user.password}"></label>
+                            <input type="password" class="form-control" id="login-pass" th:field="*{password}">
+                            <div th:if="${#fields.hasErrors('password')}" class="text-danger mt-2"
+                                 th:errors="*{password}"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" th:text="#{object.user.continue}"></button>
+                        <p class="mt-2">
+                            <a id="showRegisterForm" th:text="#{object.user.registration}"></a>
+                        </p>
+                    </form>
+
+                    <!--          REGISTRATION FORM        -->
+                    <form id="registerForm" th:action="@{signup}" method="post" th:object="${createDTO}"
+                          style="display: none;">
+                        <div class="mb-3">
+                            <label for="register-name" class="form-label" th:text="#{object.user.name}"></label>
+                            <input type="text" class="form-control" id="register-name" th:field="*{name}">
+                            <div th:if="${#fields.hasErrors('name')}" class="text-danger mt-2"
+                                 th:errors="*{name}"></div>
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label" th:text="#{object.user.email}"></label>
+                            <input type="email" class="form-control" id="register-email" th:field="*{email}">
+                            <div th:unless="${#fields.hasErrors('email')}">
+                                <div class="form-text" th:text="#{safety.message}"></div>
+                            </div>
+                            <div th:if="${#fields.hasErrors('email')}" class="text-danger mt-2"
+                                 th:errors="*{email}"></div>
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-pass" class="form-label" th:text="#{object.user.password}"></label>
+                            <input type="password" class="form-control" id="register-pass" th:field="*{password}">
+                            <div th:if="${#fields.hasErrors('password')}" class="text-danger mt-2"
+                                 th:errors="*{password}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="register-confirm-pass" class="form-label"
+                                   th:text="#{object.user.confirm.password}"></label>
+                            <input type="password" class="form-control" id="register-confirm-pass">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" th:text="#{user.btn.register}"></button>
+                        <p class="mt-2">
+                            <a id="showLoginForm" th:text="#{object.user.registration.question}"></a>
+                        </p>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Who are you (only for employees)-->
+<div th:if="${role == 'MANAGER' or role == 'ADMIN'}"
+     th:text="'You are ' + ${role}"
+     style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 50px; font-weight: bold; text-transform: uppercase;">
+</div>
+
+<!--Hot propositions (only for clients)-->
+<div th:if="${!#lists.isEmpty(discountedAppliances) or !#lists.isEmpty(mostPopularAppliances)}" class="container my-5">
+    <h1 class="text-center mb-4 display-4" th:text="#{banner.welcome-message}"></h1>
+
+    <div class="row g-4">
+        <!-- Товары со скидкой -->
+        <div class="col-lg-6">
+            <div class="card border-primary mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0" th:text="#{banner.hot-sales}"></h2>
+                </div>
+                <div class="card-body">
+                    <div th:if="${discountedAppliances.isEmpty()}" class="alert alert-warning mb-0"
+                         th:text="#{banner.no-bestsellers}">
+                    </div>
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                        <div th:each="appliance : ${discountedAppliances}" class="col">
+                            <div class="card h-100 position-relative">
+                                    <span th:if="${appliance.discount > 0}"
+                                          class="position-absolute top-0 end-0 badge bg-danger rounded-pill m-2 fs-6">
+                                        -<span th:text="${appliance.discount}"></span>%
+                                    </span>
+                                <img th:src="@{/product.jpg}" class="card-img-top p-3" alt="Товар">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title" th:text="${appliance.name}"></h5>
+                                    <p class="card-text text-muted small" th:text="${appliance.description}"></p>
+                                    <div class="mt-auto">
+                                        <div th:if="${appliance.discount > 0}">
+                                                <span class="text-decoration-line-through text-muted"
+                                                      th:text="${appliance.price} + '₽'"></span>
+                                            <h4 class="text-danger"
+                                                th:text="${#numbers.formatDecimal(appliance.price - (appliance.price * appliance.discount / 100), 1, 2)} + '₴'"></h4>
+                                        </div>
+                                        <div th:unless="${appliance.discount > 0}">
+                                            <h4 class="text-dark" th:text="${appliance.price} + '₴'"></h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Популярные товары -->
+        <div class="col-lg-6">
+            <div class="card border-success mb-4">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h4 mb-0" th:text="#{banner.bestsellers}"></h2>
+                </div>
+                <div class="card-body">
+                    <div th:if="${mostPopularAppliances.isEmpty()}" class="alert alert-warning mb-0"
+                         th:text="#{banner.no-discounted}">
+                    </div>
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                        <div th:each="appliance : ${mostPopularAppliances}" th:if="${appliance.salesCount > 0}"
+                             class="col">
+                            <div class="card h-100">
+                                    <span class="position-absolute top-0 start-0 badge bg-warning text-dark rounded-pill m-2">
+                                        <span th:text="${appliance.salesCount}"></span> шт.
+                                    </span>
+                                <img th:src="@{/product.jpg}" class="card-img-top p-3" alt="Товар">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title" th:text="${appliance.name}"></h5>
+                                    <p class="card-text text-muted small" th:text="${appliance.description}"></p>
+                                    <div class="mt-auto">
+                                        <h4 class="text-dark mb-0" th:text="${appliance.price} + '₽'"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:insert="~{footer::footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("showRegisterForm").addEventListener("click", function (event) {
+        event.preventDefault();
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("registerForm").style.display = "block";
+
+        document.querySelector(".signin-title").style.display = "none";
+        document.querySelector(".signup-title").style.display = "block";
+    });
+
+    document.getElementById("showLoginForm").addEventListener("click", function (event) {
+        event.preventDefault();
+        document.getElementById("registerForm").style.display = "none";
+        document.getElementById("loginForm").style.display = "block";
+
+        document.querySelector(".signup-title").style.display = "none";
+        document.querySelector(".signin-title").style.display = "block";
+    });
+</script>
+<script th:if="${showRegisterPopup}">
+
+    const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+    myModal.show();
+
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("registerForm").style.display = "block";
+
+    document.querySelector(".signin-title").style.display = "none";
+    document.querySelector(".signup-title").style.display = "block";
+</script>
+<script th:if="${showLoginPopup}">
+
+    const myModal = new bootstrap.Modal(document.getElementById('myModal'));
+    myModal.show();
+
+    document.getElementById("registerForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+
+    document.querySelector(".signup-title").style.display = "none";
+    document.querySelector(".signin-title").style.display = "block";
+</script>
+</body>
+</html>
