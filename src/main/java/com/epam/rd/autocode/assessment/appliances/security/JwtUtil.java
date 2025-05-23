@@ -15,7 +15,8 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private final int JWT_EXPIRATION_IN_MINUTES;
-    private final String SECRET_KEY = System.getenv("SECRET_SIGN_JWT_KEY");
+//    private final String SECRET_KEY = System.getenv("SECRET_SIGN_JWT_KEY");
+    private final String SECRET_KEY = "U2VjcmV0S2V5XzEyM0FCQ0QxMjM0NTZfSmF2YV9XZWJUb2tlbg7а";
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
 

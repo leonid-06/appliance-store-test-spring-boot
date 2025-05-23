@@ -23,8 +23,10 @@ public class AdminInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        String email = System.getenv("ADMIN_EMAIL");
-        String pass = System.getenv("ADMIN_PASSWORD");
+//        String email = System.getenv("ADMIN_EMAIL");
+//        String pass = System.getenv("ADMIN_PASSWORD");
+        String email = "admin@gmail.com";
+        String pass = "hello";
 
         Employee admin = new Employee();
         admin.setEmail(email);
